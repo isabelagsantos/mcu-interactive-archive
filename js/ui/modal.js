@@ -71,6 +71,7 @@ function detailHTML(ctx, w) {
 
   return `<article class="detail" aria-labelledby="dt-title">
     <button class="modal-close icon-btn" data-action="close-modal" aria-label="Fechar">✕</button>
+    ${it.status === 'watched' ? '<span class="stamp stamp-big stamp-done">ARQUIVO CONCLUÍDO</span>' : w.target ? '<span class="stamp stamp-big stamp-alert">ALERTA DE INCURSÃO</span>' : '<span class="stamp stamp-big">CLASSIFICADO</span>'}
     <div class="detail-head">
       <div class="detail-cover">${cover(w, cached?.poster)}</div>
       <div class="detail-meta">

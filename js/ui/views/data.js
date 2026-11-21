@@ -27,6 +27,8 @@ export function render(ctx) {
         <form class="row gap-s" data-form="omdb"><input type="password" name="key" value="${esc(external.apiKey)}" placeholder="Chave OMDb" autocomplete="off" aria-label="Chave da OMDb">
           <button class="btn ghost small" type="submit">Salvar</button></form>
         <button class="btn ghost small" data-action="clear-cache">Limpar cache de pôsteres</button></div>
+      <div class="panel"><h3>Abertura</h3><p class="muted tiny">A abertura aparece uma vez por sessão. Clique, Enter ou Esc pulam a animação.</p>
+        <button class="btn ghost small" data-action="replay-intro">▶ Rever abertura</button></div>
     </div>
     <p class="tiny muted center">Catálogo versão ${esc(CATALOG_VERSION)} · atualizações no catálogo não apagam seus registros.</p></section>`;
 }

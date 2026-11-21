@@ -12,6 +12,8 @@ Todos usam o mesmo catálogo, mas cada pessoa constrói o seu arquivo. Tudo roda
 - **Linha do tempo:** em ordem de lançamento ou cronológica, com marcos por período e destaque das conexões narrativas entre as obras.
 - **Doomsday Protocol:** uma curadoria editorial em três níveis (essenciais, recomendadas e complementares), com opção de alternar entre a jornada completa e a preparatória. É uma seleção narrativa e não confirma participações nem acontecimentos do filme.
 - **Diário cinematográfico:** registros com datas, notas, resenhas, favoritas e histórico de reassistidas, além de uma retrospectiva com as obras mais bem avaliadas, as fases favoritas e a evolução das suas notas.
+- **Mapa de conexões:** uma rede com todas as obras por fase, destacando como cada uma se liga às outras.
+- **Abertura animada:** uma sequência original de acesso ao arquivo, que aparece uma vez por sessão e pode ser pulada.
 - **Dois temas:** *MCU Classic* (vermelho e dourado) e *Doomsday Protocol* (visual de monitoramento multiversal). A troca é instantânea e não afeta seus dados.
 
 ## Privacidade e seus dados
@@ -44,6 +46,8 @@ js/core/profiles.js       Perfis locais
 js/core/userStore.js      Registros pessoais, validação e backup
 js/core/selectors.js      Estatísticas e jornada
 js/core/external.js       OMDb opcional, com cache e fallback
+js/ui/emblem.js           Emblema original, favicon e carimbos
+js/ui/intro.js            Abertura animada
 js/ui/                    Modal, utilitários e uma view por seção
 ```
 

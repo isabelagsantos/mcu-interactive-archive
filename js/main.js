@@ -16,8 +16,11 @@ import * as timeline from './ui/views/timeline.js';
 import * as doomsday from './ui/views/doomsday.js';
 import * as diary from './ui/views/diary.js';
 import * as dataView from './ui/views/data.js';
+import * as mapView from './ui/views/map.js';
+import { emblem, setFavicon } from './ui/emblem.js';
+import { playIntro } from './ui/intro.js';
 
-const ROUTES = { painel: dashboard, catalogo: catalog, linha: timeline, doomsday, diario: diary, dados: dataView };
+const ROUTES = { painel: dashboard, catalogo: catalog, linha: timeline, mapa: mapView, doomsday, diario: diary, dados: dataView };
 
 const adapter = createAdapter('mcuarchive:');
 const profiles = new ProfileManager(adapter);
@@ -36,6 +39,7 @@ function applyTheme() {
   const t = store.prefs.theme;
   document.documentElement.dataset.theme = t;
   document.querySelectorAll('[data-action="theme"]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.value === t)));
+  setFavicon(t);
   $('meta[name="theme-color"]')?.setAttribute('content', t === 'doomsday' ? '#05080a' : '#120607');
 }
 
@@ -151,6 +155,7 @@ const ACTIONS = {
       profiles.remove(p.id); store.load(profiles.activeId); toast('Perfil excluído.');
     }
   },
+  'replay-intro': () => playIntro({ agent: profiles.active.name, theme: store.prefs.theme, force: true }),
   'clear-cache': () => { external.clearCache(); render(); toast('Cache limpo.'); },
 };
 
@@ -213,6 +218,8 @@ $('#modal').addEventListener('click', (e) => { if (e.target.id === 'modal') clos
 window.addEventListener('hashchange', () => { closeModal(ctx); render({ keepScroll: false }); $('#view').focus({ preventScroll: true }); });
 
 // ---------- início ----------
+$('.brand-mark').innerHTML = emblem({ size: 34 });
 store.load(profiles.activeId);
+playIntro({ agent: profiles.active.name, theme: store.prefs.theme });
 if (!location.hash) history.replaceState(null, '', '#/painel');
 render({ keepScroll: false });
