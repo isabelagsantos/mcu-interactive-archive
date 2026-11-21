@@ -159,7 +159,8 @@ textarea { resize: vertical; }
 .cover-art { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: .7rem; gap: .2rem; }
 .cover-art::before { content: ''; position: absolute; inset: 0; z-index: -1; opacity: .5; background: radial-gradient(circle at 70% 25%, rgba(255, 255, 255, .25), transparent 40%), repeating-linear-gradient(135deg, rgba(255, 255, 255, .04) 0 2px, transparent 2px 10px); }
 [data-theme="doomsday"] .cover-art::before { background: radial-gradient(circle at 50% 35%, transparent 22%, rgba(54, 245, 180, .25) 23%, transparent 24%, transparent 32%, rgba(54, 245, 180, .15) 33%, transparent 34%), repeating-linear-gradient(0deg, rgba(0, 0, 0, .25) 0 1px, transparent 1px 3px); opacity: .9; }
-.cover-id { position: absolute; top: .55rem; left: .6rem; font: 600 .6rem var(--font-mono); letter-spacing: .1em; color: rgba(255, 255, 255, .75); }
+.cover-head { display: grid; gap: .15rem; margin-bottom: auto; padding-bottom: .3rem; }
+.cover-id { font: 600 .6rem var(--font-mono); letter-spacing: .1em; color: rgba(255, 255, 255, .75); }
 .cover-type { font: 600 .6rem var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); }
 .cover-title { font-family: var(--font-display); font-size: clamp(1rem, 2.4vw, 1.35rem); letter-spacing: var(--display-track); line-height: 1.05; color: #fff; text-shadow: 0 2px 10px rgba(0, 0, 0, .6); }
 .cover-year { font: .62rem var(--font-mono); color: rgba(255, 255, 255, .7); }
@@ -256,6 +257,21 @@ dialog::backdrop { background: rgba(0, 0, 0, .7); backdrop-filter: blur(4px); }
 .confirm-box { padding: 1.4rem; display: grid; gap: .8rem; }
 .confirm-box .row { gap: .5rem; }
 
+/* ---------- navegação entre obras no modal ---------- */
+.modal-bar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: .6rem; margin: -1.4rem -1.4rem 0; padding: .6rem 1.4rem;
+  background: color-mix(in srgb, var(--bg2) 92%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.modal-bar .spacer { flex: 1; }
+.modal-bar .modal-close { position: static; margin-left: .2rem; }
+.nav-pos { flex: 1; text-align: center; font: 600 .68rem var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav-btn { display: inline-flex; align-items: center; gap: .5rem; max-width: 34%; min-width: 0; border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); padding: .4rem .8rem; border-radius: 999px; cursor: pointer; font: inherit; font-size: 1rem; transition: .15s; }
+[data-theme="doomsday"] .nav-btn { border-radius: 3px; }
+.nav-btn:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); color: #fff; transform: translateY(-1px); }
+.nav-btn:disabled { opacity: .35; cursor: not-allowed; }
+.nav-btn.prev { text-align: left; } .nav-btn.next { text-align: right; flex-direction: row; }
+.nav-text { display: grid; min-width: 0; line-height: 1.15; }
+.nav-text small { font: 600 .6rem var(--font-mono); letter-spacing: .12em; text-transform: uppercase; opacity: .75; }
+.nav-text b { font-size: .8rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
 /* ---------- linha do tempo ---------- */
 .legend { list-style: none; display: flex; flex-wrap: wrap; gap: .4rem 1rem; padding: 0; margin: 0; font-size: .8rem; color: var(--muted); }
 .legend li::before { content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: .35rem; background: var(--c); vertical-align: -1px; }
@@ -335,10 +351,10 @@ dialog::backdrop { background: rgba(0, 0, 0, .7); backdrop-filter: blur(4px); }
   #modal { max-height: 100dvh; width: 100vw; max-width: 100vw; border-radius: 0; margin: 0; height: 100dvh; }
 }
 /* ---------- carimbos ---------- */
-.stamp { position: absolute; z-index: 3; top: 10px; right: 8px; transform: rotate(8deg); padding: .15rem .45rem; border: 2px solid currentColor; border-radius: 4px;
+.stamp { position: absolute; z-index: 3; top: 2.6rem; right: 8px; transform: rotate(8deg); padding: .15rem .45rem; border: 2px solid currentColor; border-radius: 4px;
   font: 700 .58rem var(--font-mono); letter-spacing: .14em; color: var(--accent); background: color-mix(in srgb, var(--bg) 55%, transparent); mix-blend-mode: screen; opacity: .9; }
 .stamp-soon { color: var(--soon); } .stamp-alert { color: var(--danger); } .stamp-done { color: var(--ok); }
-.stamp-big { position: absolute; top: 1.1rem; right: 4rem; font-size: .8rem; padding: .3rem .8rem; border-width: 3px; transform: rotate(-6deg); animation: stampIn .5s cubic-bezier(.3, 1.6, .5, 1); }
+.stamp-big { position: absolute; top: 4.4rem; right: 2.2rem; font-size: .8rem; padding: .3rem .8rem; border-width: 3px; transform: rotate(-6deg); animation: stampIn .5s cubic-bezier(.3, 1.6, .5, 1); }
 @keyframes stampIn { from { transform: rotate(-6deg) scale(2.2); opacity: 0; } }
 .card.st-watched .stamp { display: none; }
 
@@ -347,10 +363,11 @@ dialog::backdrop { background: rgba(0, 0, 0, .7); backdrop-filter: blur(4px); }
 .cover-glyph path { fill: rgba(255, 255, 255, .06); }
 [data-theme="doomsday"] .cover-glyph { stroke: color-mix(in srgb, var(--accent) 35%, transparent); animation: spin 40s linear infinite; transform-origin: center; }
 .card:hover .cover-glyph { stroke: rgba(255, 255, 255, .25); }
-.cover.type-serie .cover-art::after, .cover.type-animacao .cover-art::after { content: ''; position: absolute; left: .7rem; right: .7rem; top: 1.7rem; height: 3px;
-  background: repeating-linear-gradient(90deg, var(--accent-2) 0 14px, transparent 14px 20px); opacity: .7; }
-.cover-class { position: absolute; top: 1.95rem; left: .7rem; font: 600 .5rem var(--font-mono); letter-spacing: .14em; color: rgba(255, 255, 255, .55); }
-.cover.type-filme .cover-class { top: 1.5rem; }
+.cover.type-serie .cover-head, .cover.type-animacao .cover-head { border-bottom: 2px dashed color-mix(in srgb, var(--accent-2) 70%, transparent); }
+.cover-class { font: 600 .5rem var(--font-mono); letter-spacing: .14em; color: rgba(255, 255, 255, .55); }
+.cover { container-type: inline-size; }
+.cover-art { overflow: hidden; }
+@container (max-width: 135px) { .stamp:not(.stamp-big) { top: 1.5rem; } .cover-class { display: none; } .cover-title { font-size: .95rem; } .cover-art { padding: .5rem; } }
 .detail .stamp-big + .detail-head .detail-meta h2 { padding-right: 9rem; }
 
 /* ---------- fundo radar (doomsday) ---------- */
@@ -413,7 +430,8 @@ body.intro-lock { overflow: hidden; }
 .intro-reduced .intro-term, .intro-reduced .intro-threads, .intro-reduced .intro-flash { display: none; }
 .intro-reduced .intro-emblem, .intro-reduced .intro-title, .intro-reduced .intro-sub { opacity: 1; }
 
-@media (max-width: 720px) { .stamp-big { right: 3.4rem; font-size: .62rem; } .detail .stamp-big + .detail-head .detail-meta h2 { padding-right: 0; } .detail-head { margin-top: 1.6rem; } }
+@media (max-width: 720px) { .modal-bar { margin: -1rem -1rem 0; padding: .5rem .8rem; gap: .4rem; } .nav-btn { padding: .4rem .7rem; max-width: none; } .nav-text b { display: none; } .nav-pos { font-size: .6rem; letter-spacing: .04em; }
+  .stamp-big { display: none; } .detail .stamp-big + .detail-head .detail-meta h2 { padding-right: 0; } .detail-head { margin-top: 1.6rem; } }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

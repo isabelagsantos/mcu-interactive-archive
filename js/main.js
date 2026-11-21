@@ -7,7 +7,7 @@ import { createAdapter } from './core/storage.js';
 import { ProfileManager } from './core/profiles.js';
 import { UserStore, validateBackup } from './core/userStore.js';
 import { ExternalData } from './core/external.js';
-import { isUpcoming } from './core/selectors.js';
+import { isUpcoming, journeyWorks } from './core/selectors.js';
 import { $, esc, toast, confirmDialog } from './ui/dom.js';
 import { openModal, closeModal, renderModal } from './ui/modal.js';
 import * as dashboard from './ui/views/dashboard.js';
@@ -56,6 +56,7 @@ function render({ keepScroll = true } = {}) {
   }
   document.querySelectorAll('.nav a').forEach((a) => a.toggleAttribute('aria-current', a.getAttribute('href') === `#/${name}`));
   $('#profile-name').textContent = profiles.active.name;
+  watchPosters();
   if (keepScroll) window.scrollTo(0, y);
 }
 
@@ -95,8 +96,80 @@ async function loadPosters() {
   toast(`${ok} pôster(es) carregados.`, 'ok');
 }
 
+// ---------- pôsteres em segundo plano ----------
+// Só busca as capas que aparecem na tela, no máximo 3 por vez, e cada obra
+// gasta uma única consulta (o resultado fica em cache por 30 dias).
+let posterObserver = null;
+const posterQueue = [], posterQueued = new Set();
+let posterActive = 0, posterWarned = false;
+
+function applyPoster(id, url) {
+  document.querySelectorAll(`.cover[data-work="${CSS.escape(id)}"]`).forEach((c) => {
+    if (c.querySelector('img')) return;
+    const img = new Image();
+    img.alt = ''; img.decoding = 'async';
+    img.onerror = () => img.remove();
+    img.src = url;
+    c.appendChild(img);
+  });
+}
+
+function pumpPosters() {
+  while (posterActive < 3 && posterQueue.length && !external.paused) {
+    const w = posterQueue.shift();
+    posterActive++;
+    external.get(w).then((r) => {
+      if (r.poster) applyPoster(w.id, r.poster);
+      if (r.status === 'error' && r.message && !posterWarned) { posterWarned = true; toast(r.message, 'warn'); }
+    }).finally(() => { posterActive--; posterQueued.delete(w.id); pumpPosters(); });
+  }
+}
+
+function watchPosters() {
+  posterObserver?.disconnect();
+  if (!external.apiKey || external.paused || !('IntersectionObserver' in window)) return;
+  posterObserver = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      const w = BY_ID[e.target.dataset.work];
+      posterObserver.unobserve(e.target);
+      if (!w || external.cached(w) || posterQueued.has(w.id)) continue;
+      posterQueued.add(w.id); posterQueue.push(w);
+    }
+    pumpPosters();
+  }, { rootMargin: '300px' });
+  document.querySelectorAll('#view .cover[data-work]').forEach((c) => { if (!c.querySelector('img')) posterObserver.observe(c); });
+}
+
+/** Define a lista de navegação (anterior/próxima) conforme a tela de onde a obra foi aberta. */
+const NAV_SCOPES = [
+  ['.timeline', 'Linha do tempo'], ['#catalog-results', 'Catálogo'], ['.map', 'Mapa'],
+  ['.doomsday-view', 'Doomsday Protocol'], ['#diary-results', 'Diário'],
+];
+function setNavContext(el) {
+  const id = el.dataset.id;
+  if (el.closest('#modal')) { // abrindo por uma conexão dentro do detalhe: mantém a lista se a obra estiver nela
+    if (!ctx.ui.nav?.ids.includes(id)) ctx.ui.nav = null;
+    return;
+  }
+  for (const [sel, label] of NAV_SCOPES) {
+    const scope = el.closest(sel);
+    if (!scope) continue;
+    const ids = [...new Set([...scope.querySelectorAll('[data-action="open"][data-id]')].map((n) => n.dataset.id))].filter((x) => BY_ID[x]);
+    ctx.ui.nav = ids.includes(id) ? { ids, label } : null;
+    return;
+  }
+  if (el.closest('.dash')) {
+    const ids = journeyWorks(store).map((w) => w.id);
+    ctx.ui.nav = ids.includes(id) ? { ids, label: 'Minha jornada' } : null;
+    return;
+  }
+  ctx.ui.nav = null;
+}
+
 const ACTIONS = {
-  open: (el) => openModal(ctx, { kind: 'detail', id: el.dataset.id }),
+  open: (el) => { setNavContext(el); openModal(ctx, { kind: 'detail', id: el.dataset.id }); },
+  nav: (el) => openModal(ctx, { kind: 'detail', id: el.dataset.id }),
   'close-modal': () => closeModal(ctx),
   'back-detail': (el) => openModal(ctx, { kind: 'detail', id: el.dataset.id }),
   select: (el) => { const id = el.dataset.id; store.toggleSelected(id); toast(store.item(id).selected ? 'Adicionada à sua lista.' : 'Removida da sua lista.'); },
@@ -212,7 +285,18 @@ document.addEventListener('submit', (e) => {
   openModal(ctx, { kind: 'detail', id });
 });
 
-$('#modal').addEventListener('close', () => { ctx.ui.modal = null; });
+$('#modal').addEventListener('close', () => { ctx.ui.modal = null; ctx.ui.nav = null; ctx.ui.lastModalId = null; });
+
+// Setas ← → navegam entre as obras com o detalhe aberto (exceto ao digitar em campos).
+document.addEventListener('keydown', (e) => {
+  const st = ctx.ui.modal;
+  if (!st || st.kind !== 'detail' || !ctx.ui.nav || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+  if (e.target.closest?.('input, textarea, select, [contenteditable]')) return;
+  const idx = ctx.ui.nav.ids.indexOf(st.id);
+  const target = ctx.ui.nav.ids[idx + (e.key === 'ArrowRight' ? 1 : -1)];
+  if (target) { e.preventDefault(); openModal(ctx, { kind: 'detail', id: target }); }
+});
 $('#modal').addEventListener('click', (e) => { if (e.target.id === 'modal') closeModal(ctx); });
 
 window.addEventListener('hashchange', () => { closeModal(ctx); render({ keepScroll: false }); $('#view').focus({ preventScroll: true }); });

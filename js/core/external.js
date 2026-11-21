@@ -18,12 +18,15 @@ export class ExternalData {
     this.json = new JsonStore(adapter);
     this.cache = this.json.read(CACHE_KEY, {});
     this.inflight = new Map();
+    this.paused = false; // true quando a chave é inválida ou o limite diário acabou
+    this.pausedMsg = '';
   }
   get apiKey() { return this.json.read(SETTINGS_KEY, {}).omdbKey || ''; }
   setApiKey(key) {
     const s = this.json.read(SETTINGS_KEY, {});
     s.omdbKey = String(key || '').trim().replace(/[^\w-]/g, '').slice(0, 40);
     this.json.write(SETTINGS_KEY, s);
+    this.paused = false;
   }
   clearCache() { this.cache = {}; this.json.remove(CACHE_KEY); }
   cached(work) {
@@ -37,12 +40,15 @@ export class ExternalData {
     const hit = this.cached(work);
     if (hit) return hit;
     if (!this.apiKey) return { status: 'nokey' };
+    if (this.paused) return { status: 'error', message: this.pausedMsg };
     if (!work.omdb) return { status: 'notfound' };
     if (this.inflight.has(work.id)) return this.inflight.get(work.id);
     const p = this.fetchWork(work).finally(() => this.inflight.delete(work.id));
     this.inflight.set(work.id, p);
     return p;
   }
+
+  pause(message) { this.paused = true; this.pausedMsg = message; return { status: 'error', message }; }
 
   async fetchWork(work) {
     const q = new URLSearchParams({ apikey: this.apiKey, t: work.omdb.t });
@@ -55,7 +61,10 @@ export class ExternalData {
       if (!res.ok) return { status: 'error' };
       const d = await res.json();
       if (d.Response === 'False') {
-        if (/api key/i.test(d.Error || '')) return { status: 'error', message: 'Chave OMDb inválida.' };
+        const err = d.Error || '';
+        if (/api key/i.test(err)) return this.pause('Chave OMDb inválida.');
+        if (/limit/i.test(err)) return this.pause('Limite diário da OMDb atingido. Os pôsteres voltam a carregar amanhã.');
+        if (!/not found/i.test(err)) return { status: 'error' }; // erro desconhecido: não grava no cache
         const out = { status: 'notfound', at: Date.now() };
         this.cache[work.id] = out; this.saveCache();
         return out;

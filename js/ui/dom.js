@@ -60,9 +60,9 @@ export function emptyState(title, text, actionHTML = '') {
 export function cover(w, poster) {
   const img = poster ? `<img src="${esc(poster)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : '';
   const st = isUpcoming(w) ? '<span class="stamp stamp-soon">EM BREVE</span>' : w.tier === 'e' ? '<span class="stamp stamp-alert">PRIORIDADE ALFA</span>' : '';
-  return `<div class="cover phase-${w.phase} type-${w.type}" aria-hidden="true">
+  return `<div class="cover phase-${w.phase} type-${w.type}" data-work="${esc(w.id)}" aria-hidden="true">
     <svg class="cover-glyph" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38"/><circle cx="50" cy="50" r="26"/><ellipse cx="50" cy="50" rx="44" ry="14" transform="rotate(${(w.phase * 37) % 180} 50 50)"/><path d="M50 30 L62 50 L50 70 L38 50Z"/></svg>
-    ${st}<div class="cover-art"><span class="cover-class">CLASSIFICADO · NÍVEL ${w.phase}</span><span class="cover-id">${esc(missionId(w))}</span>
+    ${st}<div class="cover-art"><div class="cover-head"><span class="cover-id">${esc(missionId(w))}</span><span class="cover-class">CLASSIFICADO · NÍVEL ${w.phase}</span></div>
       <span class="cover-type">${esc(typeLabel(w))}</span>
       <strong class="cover-title">${esc(w.t)}</strong>
       <span class="cover-year">${esc(w.year)} · FASE ${w.phase}</span></div>${img}</div>`;

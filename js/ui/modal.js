@@ -15,7 +15,7 @@ export function openModal(ctx, state) {
 
 export function closeModal(ctx) {
   const dlg = $('#modal');
-  ctx.ui.modal = null;
+  ctx.ui.modal = null; ctx.ui.nav = null; ctx.ui.lastModalId = null;
   if (dlg.open) dlg.close();
   if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
 }
@@ -26,7 +26,10 @@ export function renderModal(ctx) {
   if (!st || !dlg.open) return;
   const w = BY_ID[st.id];
   if (!w) { closeModal(ctx); return; }
+  const changed = ctx.ui.lastModalId !== `${st.kind}:${st.id}`;
+  ctx.ui.lastModalId = `${st.kind}:${st.id}`;
   dlg.innerHTML = st.kind === 'form' ? formHTML(ctx, w, st) : detailHTML(ctx, w);
+  if (changed) dlg.scrollTop = 0;
   if (st.kind === 'detail') loadExternal(ctx, w);
   const focusEl = dlg.querySelector('[autofocus]') || dlg.querySelector('.modal-close');
   focusEl?.focus({ preventScroll: true });
@@ -56,6 +59,21 @@ async function loadExternal(ctx, w) {
   }
 }
 
+/** Barra superior fixa: anterior / posição / próxima / fechar. Segue a ordem da tela de origem. */
+function navBar(ctx, w) {
+  const nav = ctx.ui.nav;
+  const idx = nav ? nav.ids.indexOf(w.id) : -1;
+  const close = '<button class="modal-close icon-btn" data-action="close-modal" aria-label="Fechar">✕</button>';
+  if (idx < 0) return `<div class="modal-bar"><span class="spacer"></span>${close}</div>`;
+  const prev = BY_ID[nav.ids[idx - 1]], next = BY_ID[nav.ids[idx + 1]];
+  const btn = (target, dir) => {
+    const label = dir === 'prev' ? 'Anterior' : 'Próxima';
+    if (!target) return `<button class="nav-btn ${dir}" disabled aria-label="${label}: não há">${dir === 'prev' ? '◂' : ''}<span class="nav-text"><small>${label}</small></span>${dir === 'next' ? '▸' : ''}</button>`;
+    return `<button class="nav-btn ${dir}" data-action="nav" data-id="${target.id}" aria-label="${label}: ${esc(target.t)}" title="${esc(target.t)} (tecla ${dir === 'prev' ? '←' : '→'})">${dir === 'prev' ? '◂' : ''}<span class="nav-text"><small>${label}</small><b>${esc(target.t)}</b></span>${dir === 'next' ? '▸' : ''}</button>`;
+  };
+  return `<div class="modal-bar">${btn(prev, 'prev')}<span class="nav-pos" aria-live="polite">${esc(nav.label)} · ${idx + 1}/${nav.ids.length}</span>${btn(next, 'next')}${close}</div>`;
+}
+
 function detailHTML(ctx, w) {
   const it = ctx.store.item(w.id);
   const upcoming = isUpcoming(w);
@@ -70,7 +88,7 @@ function detailHTML(ctx, w) {
     : '<p class="muted">Nenhuma visualização registrada.</p>';
 
   return `<article class="detail" aria-labelledby="dt-title">
-    <button class="modal-close icon-btn" data-action="close-modal" aria-label="Fechar">✕</button>
+    ${navBar(ctx, w)}
     ${it.status === 'watched' ? '<span class="stamp stamp-big stamp-done">ARQUIVO CONCLUÍDO</span>' : w.target ? '<span class="stamp stamp-big stamp-alert">ALERTA DE INCURSÃO</span>' : '<span class="stamp stamp-big">CLASSIFICADO</span>'}
     <div class="detail-head">
       <div class="detail-cover">${cover(w, cached?.poster)}</div>
