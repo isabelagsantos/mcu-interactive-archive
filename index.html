@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="classic">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MCU Interactive Archive</title>
+  <meta name="description" content="Catálogo pessoal e guia de acompanhamento do Marvel Cinematic Universe. Seus dados ficam só no seu navegador.">
+  <meta name="theme-color" content="#120607">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23b3121b'/%3E%3Ccircle cx='32' cy='32' r='20' fill='none' stroke='%23e8c26a' stroke-width='4'/%3E%3Cpath d='M32 14l5 13h13l-10 8 4 14-12-9-12 9 4-14-10-8h13z' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Rajdhani:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip" href="#view">Pular para o conteúdo</a>
+  <div class="fx" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="#/painel" aria-label="MCU Interactive Archive, ir ao painel">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-text"><strong>MCU</strong> Interactive Archive</span>
+    </a>
+    <nav class="nav" aria-label="Seções">
+      <a href="#/painel"><span aria-hidden="true">◈</span> Painel</a>
+      <a href="#/catalogo"><span aria-hidden="true">▤</span> Catálogo</a>
+      <a href="#/linha"><span aria-hidden="true">⟿</span> Linha do tempo</a>
+      <a href="#/doomsday"><span aria-hidden="true">⚠</span> Doomsday</a>
+      <a href="#/diario"><span aria-hidden="true">✎</span> Diário</a>
+      <a href="#/dados"><span aria-hidden="true">⛁</span> Dados</a>
+    </nav>
+    <div class="top-tools">
+      <div class="theme-switch" role="group" aria-label="Tema">
+        <button data-action="theme" data-value="classic" aria-pressed="true" title="MCU Classic">Classic</button>
+        <button data-action="theme" data-value="doomsday" aria-pressed="false" title="Doomsday Protocol">Doomsday</button>
+      </div>
+      <a class="agent" href="#/dados" title="Perfil local"><span aria-hidden="true">◉</span> <span id="profile-name">Agente</span></a>
+    </div>
+  </header>
+
+  <main id="view" tabindex="-1" aria-live="polite">
+    <noscript><p class="empty">Este app precisa de JavaScript ativado.</p></noscript>
+  </main>
+
+  <footer class="foot">
+    <p>Projeto de fã, sem vínculo com a Marvel Studios ou a Disney. Seus dados ficam apenas neste navegador.</p>
+  </footer>
+
+  <dialog id="modal" aria-label="Detalhes da obra"></dialog>
+  <dialog id="confirm" aria-label="Confirmação"></dialog>
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
