@@ -5,6 +5,7 @@
  */
 import { JsonStore } from './storage.js';
 import { ProfileManager } from './profiles.js';
+import { localISO } from './dates.js';
 
 export const SCHEMA_VERSION = 1;
 export const APP_ID = 'mcu-interactive-archive';
@@ -12,7 +13,7 @@ export const APP_ID = 'mcu-interactive-archive';
 export const STATUS = { unwatched: 'Não assistida', progress: 'Em andamento', watched: 'Assistida' };
 export const VIEW_KIND = { first: 'Primeira visualização', before: 'Assistida anteriormente', rewatch: 'Reassistida' };
 
-const today = () => new Date().toISOString().slice(0, 10);
+const today = () => localISO();
 const rid = () => Math.random().toString(36).slice(2, 10);
 
 export const defaultPrefs = () => ({ theme: 'classic', journey: 'full', order: 'chrono', doomsdayTiers: ['e', 'r'] });

@@ -1,7 +1,8 @@
 /** Cálculos derivados (estatísticas, jornada, próxima obra). Sem acesso ao DOM. */
 import { WORKS, CHRONO_ORDER, RELEASE_ORDER, BY_ID } from '../catalog/catalog.js';
+import { localISO } from './dates.js';
 
-export const todayISO = () => new Date().toISOString().slice(0, 10);
+export const todayISO = () => localISO();
 export const isReleased = (w) => w.releaseKey <= todayISO() && String(w.date).length > 4;
 export const isUpcoming = (w) => !isReleased(w);
 

@@ -7,6 +7,7 @@ import { createAdapter } from './core/storage.js';
 import { ProfileManager } from './core/profiles.js';
 import { UserStore, validateBackup } from './core/userStore.js';
 import { ExternalData } from './core/external.js';
+import { localISO } from './core/dates.js';
 import { isUpcoming, journeyWorks } from './core/selectors.js';
 import { $, esc, toast, confirmDialog } from './ui/dom.js';
 import { openModal, closeModal, renderModal } from './ui/modal.js';
@@ -214,7 +215,7 @@ const ACTIONS = {
   'load-posters': loadPosters,
   export: () => {
     const name = profiles.active.name.replace(/[^\w-]+/g, '_');
-    download(`mcu-archive-${name}-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(store.exportData(profiles.active.name), null, 2));
+    download(`mcu-archive-${name}-${localISO()}.json`, JSON.stringify(store.exportData(profiles.active.name), null, 2));
     toast('Backup exportado.', 'ok');
   },
   reset: async () => {

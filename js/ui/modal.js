@@ -2,6 +2,7 @@
 import { BY_ID, TIERS } from '../catalog/catalog.js';
 import { STATUS, VIEW_KIND } from '../core/userStore.js';
 import { isUpcoming } from '../core/selectors.js';
+import { localISO } from '../core/dates.js';
 import { esc, $, fmtDate, duration, typeLabel, sagaLabel, missionId, statusBadge, cover } from './dom.js';
 
 let lastFocus = null;
@@ -149,7 +150,7 @@ function formHTML(ctx, w, st) {
   const it = ctx.store.item(w.id);
   const edit = st.mode === 'edit';
   const kind = st.viewKind || (it.mode === 'rewatch' || it.status === 'watched' ? 'rewatch' : 'first');
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localISO();
   return `<form class="detail form" data-form="${edit ? 'edit' : 'complete'}" data-id="${w.id}" aria-labelledby="fm-title">
     <button type="button" class="modal-close icon-btn" data-action="back-detail" data-id="${w.id}" aria-label="Voltar">✕</button>
     <p class="eyebrow">RELATÓRIO DE MISSÃO · ${esc(missionId(w))}</p>
