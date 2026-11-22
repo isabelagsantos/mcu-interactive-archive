@@ -59,10 +59,9 @@ p { margin: 0 0 .8em; }
 .topbar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 1rem; padding: .7rem clamp(.8rem, 3vw, 2rem);
   background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
 .brand { display: flex; align-items: center; gap: .6rem; color: var(--text); text-decoration: none; white-space: nowrap; }
-.brand-mark { display: grid; width: 34px; height: 34px; filter: drop-shadow(0 0 8px color-mix(in srgb, var(--accent) 55%, transparent)); }
-.brand:hover .em-orbits { animation: spin 3s linear infinite; }
-[data-theme="doomsday"] .brand-mark .em-ticks { animation: spin 12s linear infinite; }
-.emblem .em-orbits, .emblem .em-ticks { transform-origin: 50px 50px; transform-box: view-box; }
+.brand-mark { display: grid; width: 34px; height: 34px; filter: drop-shadow(0 0 8px rgba(179, 18, 27, .6)); }
+.emblem .em-star { transform-box: fill-box; transform-origin: center; }
+.brand:hover .em-star { animation: spin 3s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .brand-text { font-family: var(--font-display); font-size: 1.3rem; letter-spacing: var(--display-track); }
 .brand-text strong { color: var(--accent); }
@@ -214,7 +213,7 @@ textarea { resize: vertical; }
 
 /* ---------- empty / notice ---------- */
 .empty { text-align: center; padding: 2.5rem 1rem; color: var(--muted); }
-.empty h3 { color: var(--text); } .empty-icon { font-size: 2.2rem; color: var(--accent-2); }
+.empty h3 { color: var(--text); } .empty-icon { display: grid; place-items: center; opacity: .85; margin-bottom: .4rem; }
 .notice { border: 1px solid color-mix(in srgb, var(--accent-2) 50%, transparent); background: color-mix(in srgb, var(--accent-2) 8%, transparent); border-radius: var(--radius); padding: .7rem 1rem; font-size: .88rem; }
 .notice.warn { border-color: var(--warn); }
 
@@ -412,10 +411,11 @@ body.intro-lock { overflow: hidden; }
 .intro-flash { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: #fff; box-shadow: 0 0 60px 30px var(--accent-2); opacity: 0; animation: flash .7s 2.7s ease-out forwards; }
 @keyframes flash { 0% { opacity: 0; transform: scale(.2); } 30% { opacity: 1; } 100% { opacity: 0; transform: scale(40); } }
 .intro-core { position: relative; display: grid; justify-items: center; gap: .6rem; text-align: center; padding: 0 1rem; }
-.intro-emblem { opacity: 0; filter: drop-shadow(0 0 22px var(--accent)); animation: emIn 1s 2.8s cubic-bezier(.2, 1.2, .3, 1) forwards; }
-.intro-emblem .em-ring { stroke-dasharray: 290; stroke-dashoffset: 290; animation: draw 1s 2.8s ease-out forwards; }
-.intro-emblem .em-orbits { animation: spin 2.4s 2.8s cubic-bezier(.2, .8, .2, 1) both; }
-@keyframes emIn { from { opacity: 0; transform: scale(.4) rotate(-90deg); } to { opacity: 1; transform: none; } }
+.intro-emblem { opacity: 0; filter: drop-shadow(0 0 26px rgba(226, 54, 54, .8)); animation: emIn .9s 2.8s cubic-bezier(.2, 1.2, .3, 1) forwards; }
+.intro-emblem .em-ring { stroke-dasharray: 126; stroke-dashoffset: 126; animation: draw .9s 3s ease-out forwards; }
+.intro-emblem .em-star { opacity: 0; animation: starPop .7s 3.5s cubic-bezier(.2, 1.6, .4, 1) forwards; }
+@keyframes emIn { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+@keyframes starPop { from { opacity: 0; transform: scale(.2) rotate(-72deg); } to { opacity: 1; transform: none; } }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 .intro-title { margin: 0; font-family: var(--font-display); font-size: clamp(2rem, 7vw, 4.4rem); letter-spacing: .08em; opacity: 0; animation: titleIn .8s 3.4s ease-out forwards; }
 .intro-title span { color: var(--accent); }
@@ -429,6 +429,8 @@ body.intro-lock { overflow: hidden; }
 .intro-reduced * { animation: none !important; }
 .intro-reduced .intro-term, .intro-reduced .intro-threads, .intro-reduced .intro-flash { display: none; }
 .intro-reduced .intro-emblem, .intro-reduced .intro-title, .intro-reduced .intro-sub { opacity: 1; }
+.intro-reduced .em-ring { stroke-dashoffset: 0 !important; }
+.intro-reduced .em-star { opacity: 1 !important; }
 
 @media (max-width: 720px) { .modal-bar { margin: -1rem -1rem 0; padding: .5rem .8rem; gap: .4rem; } .nav-btn { padding: .4rem .7rem; max-width: none; } .nav-text b { display: none; } .nav-pos { font-size: .6rem; letter-spacing: .04em; }
   .stamp-big { display: none; } .detail .stamp-big + .detail-head .detail-meta h2 { padding-right: 0; } .detail-head { margin-top: 1.6rem; } }

@@ -1,6 +1,7 @@
 /** Utilitários de interface. */
 import { TYPES, SAGAS } from '../catalog/catalog.js';
 import { isUpcoming } from '../core/selectors.js';
+import { emblem, STAR_PATH } from './emblem.js';
 
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 export const $ = (sel, root = document) => root.querySelector(sel);
@@ -53,7 +54,7 @@ export function confirmDialog({ title, body, confirmLabel = 'Confirmar', danger 
 }
 
 export function emptyState(title, text, actionHTML = '') {
-  return `<div class="empty"><div class="empty-icon" aria-hidden="true">◎</div><h3>${esc(title)}</h3><p>${esc(text)}</p>${actionHTML}</div>`;
+  return `<div class="empty"><div class="empty-icon" aria-hidden="true">${emblem({ size: 56 })}</div><h3>${esc(title)}</h3><p>${esc(text)}</p>${actionHTML}</div>`;
 }
 
 /** Capa gerada (fallback quando não há pôster). */
@@ -61,7 +62,7 @@ export function cover(w, poster) {
   const img = poster ? `<img src="${esc(poster)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : '';
   const st = isUpcoming(w) ? '<span class="stamp stamp-soon">EM BREVE</span>' : w.tier === 'e' ? '<span class="stamp stamp-alert">PRIORIDADE ALFA</span>' : '';
   return `<div class="cover phase-${w.phase} type-${w.type}" data-work="${esc(w.id)}" aria-hidden="true">
-    <svg class="cover-glyph" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38"/><circle cx="50" cy="50" r="26"/><ellipse cx="50" cy="50" rx="44" ry="14" transform="rotate(${(w.phase * 37) % 180} 50 50)"/><path d="M50 30 L62 50 L50 70 L38 50Z"/></svg>
+    <svg class="cover-glyph" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38"/><circle cx="50" cy="50" r="26"/><ellipse cx="50" cy="50" rx="44" ry="14" transform="rotate(${(w.phase * 37) % 180} 50 50)"/><path transform="translate(0 0) scale(1.5625)" d="${STAR_PATH}"/></svg>
     ${st}<div class="cover-art"><div class="cover-head"><span class="cover-id">${esc(missionId(w))}</span><span class="cover-class">CLASSIFICADO · NÍVEL ${w.phase}</span></div>
       <span class="cover-type">${esc(typeLabel(w))}</span>
       <strong class="cover-title">${esc(w.t)}</strong>

@@ -1,27 +1,25 @@
 /**
- * Emblema original do MCU Interactive Archive (arte própria do projeto,
- * sem relação com marcas oficiais): anel de monitoramento, três órbitas
- * de linhas do tempo e um núcleo em losango.
+ * Símbolo oficial do MCU Interactive Archive: disco vermelho, anel dourado e
+ * estrela branca. Arte própria do projeto. As cores são fixas, então o símbolo
+ * é idêntico em qualquer tema, no favicon e na abertura.
  */
-export function emblem({ size = 32, cls = '', anim = false } = {}) {
-  return `<svg class="emblem ${cls} ${anim ? 'emblem-anim' : ''}" width="${size}" height="${size}" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
-  <defs><linearGradient id="em-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--accent)"/><stop offset="1" stop-color="var(--accent-2)"/></linearGradient></defs>
-  <circle class="em-ring" cx="50" cy="50" r="46" fill="none" stroke="url(#em-g)" stroke-width="4"/>
-  <circle class="em-ticks" cx="50" cy="50" r="39" fill="none" stroke="var(--accent-2)" stroke-width="2" stroke-dasharray="2 6.17" opacity=".8"/>
-  <g class="em-orbits" fill="none" stroke="var(--accent-2)" stroke-width="2.2" opacity=".9">
-    <ellipse cx="50" cy="50" rx="30" ry="11"/>
-    <ellipse cx="50" cy="50" rx="30" ry="11" transform="rotate(60 50 50)"/>
-    <ellipse cx="50" cy="50" rx="30" ry="11" transform="rotate(120 50 50)"/>
-  </g>
-  <path class="em-core" d="M50 34 L62 50 L50 66 L38 50 Z" fill="url(#em-g)"/>
-  <circle cx="50" cy="50" r="4" fill="var(--bg)"/>
+export const BRAND = { red: '#b3121b', gold: '#e8c26a', white: '#ffffff' };
+const STAR = 'M32 14l5 13h13l-10 8 4 14-12-9-12 9 4-14-10-8h13z';
+
+export function emblem({ size = 32, cls = '' } = {}) {
+  return `<svg class="emblem ${cls}" width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <circle class="em-disc" cx="32" cy="32" r="30" fill="${BRAND.red}"/>
+  <circle class="em-ring" cx="32" cy="32" r="20" fill="none" stroke="${BRAND.gold}" stroke-width="4"/>
+  <path class="em-star" d="${STAR}" fill="${BRAND.white}"/>
 </svg>`;
 }
 
-/** Favicon do emblema (cores fixas, já que o favicon não lê variáveis CSS). */
-export function setFavicon(theme) {
-  const [a, b, bg] = theme === 'doomsday' ? ['#36f5b4', '#ffb020', '#030607'] : ['#e23636', '#e8c26a', '#0d0507'];
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='${bg}'/><circle cx='50' cy='50' r='44' fill='none' stroke='${a}' stroke-width='6'/><g fill='none' stroke='${b}' stroke-width='4'><ellipse cx='50' cy='50' rx='30' ry='11'/><ellipse cx='50' cy='50' rx='30' ry='11' transform='rotate(60 50 50)'/><ellipse cx='50' cy='50' rx='30' ry='11' transform='rotate(120 50 50)'/></g><path d='M50 34 L62 50 L50 66 L38 50 Z' fill='${a}'/></svg>`;
+/** Caminho da estrela, reaproveitado pelas capas (viewBox 64). */
+export const STAR_PATH = STAR;
+
+/** Favicon: o mesmo símbolo, igual em todos os temas. */
+export function setFavicon() {
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='${BRAND.red}'/><circle cx='32' cy='32' r='20' fill='none' stroke='${BRAND.gold}' stroke-width='4'/><path d='${STAR}' fill='${BRAND.white}'/></svg>`;
   let link = document.querySelector('link[rel="icon"]');
   if (!link) { link = document.createElement('link'); link.rel = 'icon'; document.head.appendChild(link); }
   link.href = `data:image/svg+xml,${encodeURIComponent(svg)}`;
