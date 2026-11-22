@@ -1,12 +1,7 @@
 import { CHRONO_ORDER, RELEASE_ORDER, TIERS, BY_ID } from '../../catalog/catalog.js';
 import { isUpcoming } from '../../core/selectors.js';
+import { flipClock } from '../flipclock.js';
 import { esc, fmtDate, duration, statusBadge, fmtHours } from '../dom.js';
-
-function countdown() {
-  const target = Date.parse(`${BY_ID.doomsday.date}T00:00:00-03:00`);
-  const days = Math.ceil((target - Date.now()) / 86400000);
-  return days > 0 ? `T-${days} dias` : 'Em cartaz';
-}
 
 export function render(ctx) {
   const { store } = ctx;
@@ -24,8 +19,9 @@ export function render(ctx) {
         <span class="dd-name">${esc(w.t)}</span><span class="muted tiny">${esc(duration(w))} · ${esc(fmtDate(w.date))}</span></button>${statusBadge(it, w)}
         <button class="icon-btn" data-action="status" data-id="${w.id}" data-value="${it.status === 'watched' ? 'unwatched' : 'watched'}" ${isUpcoming(w) ? 'disabled' : ''} aria-label="${it.status === 'watched' ? 'Desmarcar' : 'Marcar como assistida'}: ${esc(w.t)}">${it.status === 'watched' ? '◉' : '◯'}</button></li>`; }).join('')}</ol></section>`;
   };
-  return `<section class="view doomsday-view"><header class="view-head"><p class="eyebrow blink">⚠ PROTOCOLO ATIVO · ${esc(countdown())}</p>
+  return `<section class="view doomsday-view"><header class="view-head"><p class="eyebrow blink">⚠ PROTOCOLO ATIVO</p>
     <h1>Doomsday Protocol</h1><p>Jornada preparatória para <strong>Vingadores: Doomsday</strong> (${esc(fmtDate(BY_ID.doomsday.date))}). Uma seleção editorial em três níveis.</p>
+    <div class="countdown-inline">${flipClock()}</div>
     <div class="notice" role="note"><strong>Curadoria narrativa.</strong> Esta classificação é uma seleção editorial baseada nas tramas já lançadas. Ela não confirma a participação de personagens nem os acontecimentos do filme.</div>
     <div class="row wrap gap-s"><div class="seg small" role="group" aria-label="Jornada ativa">
       <button class="${!active ? 'on' : ''}" data-action="journey" data-value="full" aria-pressed="${!active}">Minha jornada completa</button>

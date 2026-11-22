@@ -1,0 +1,2 @@
+Coloque aqui os MP3 da voz da abertura (veja tools/gerar_voz.py).
+Sem eles o site funciona normalmente, só sem a voz.

@@ -20,10 +20,13 @@ import * as dataView from './ui/views/data.js';
 import * as mapView from './ui/views/map.js';
 import { emblem, setFavicon } from './ui/emblem.js';
 import { playIntro } from './ui/intro.js';
+import { sfx } from './ui/sound.js';
+import { startFlipClocks } from './ui/flipclock.js';
 
 const ROUTES = { painel: dashboard, catalogo: catalog, linha: timeline, mapa: mapView, doomsday, diario: diary, dados: dataView };
 
 const adapter = createAdapter('mcuarchive:');
+sfx.load(adapter);
 const profiles = new ProfileManager(adapter);
 const store = new UserStore(adapter);
 const external = new ExternalData(adapter);
@@ -168,7 +171,50 @@ function setNavContext(el) {
   ctx.ui.nav = null;
 }
 
+/** Som de cada ação (null = sem som, tratado à parte). */
+function actionSound(el) {
+  const v = el.dataset.value;
+  switch (el.dataset.action) {
+    case 'open': return 'open';
+    case 'close-modal': case 'back-detail': return 'close';
+    case 'nav': return 'nav';
+    case 'select': return el.getAttribute('aria-pressed') === 'true' ? 'off' : 'on';
+    case 'status': return v === 'unwatched' ? 'off' : v === 'progress' ? 'on' : 'tap';
+    case 'fav': return 'fav';
+    case 'theme': return v === 'doomsday' ? 'theme_doomsday' : 'theme_classic';
+    case 'preset': case 'select-visible': case 'dd-to-list': case 'rewatch': case 'before': return 'on';
+    case 'export': return 'xfer';
+    case 'reset': case 'profile-delete': case 'del-hist': return 'warn';
+    case 'sound-toggle': case 'sound-test': case 'voice-test': return null;
+    default: return 'tap';
+  }
+}
+
+function syncSoundUI() {
+  const b = $('#sound-toggle');
+  if (!b) return;
+  b.setAttribute('aria-pressed', String(sfx.on));
+  b.setAttribute('aria-label', sfx.on ? 'Som ligado' : 'Som desligado');
+  b.title = sfx.on ? 'Som ligado (clique para desligar)' : 'Som desligado (clique para ligar)';
+}
+
 const ACTIONS = {
+  'sound-toggle': async () => {
+    const next = !sfx.on;
+    if (!next) { sfx.play('toggleOff'); sfx.stopVoice(); }
+    sfx.set('on', next);
+    if (next) { await sfx.unlock(); sfx.play('toggleOn'); }
+    syncSoundUI();
+    if (routeName() === 'dados') render();
+  },
+  'sound-voice': (el) => sfx.set('voice', el.checked),
+  'sound-test': async () => { if (!sfx.on) { toast('Ligue o som primeiro.', 'warn'); return; } await sfx.unlock(); sfx.play('complete'); },
+  'voice-test': async () => {
+    if (!sfx.on) { toast('Ligue o som primeiro.', 'warn'); return; }
+    await sfx.unlock();
+    const d = await sfx.playVoice(`intro-${store.prefs.theme}-a`);
+    if (d == null) toast('Nenhum arquivo de voz encontrado na pasta /audio.', 'warn');
+  },
   open: (el) => { setNavContext(el); openModal(ctx, { kind: 'detail', id: el.dataset.id }); },
   nav: (el) => openModal(ctx, { kind: 'detail', id: el.dataset.id }),
   'close-modal': () => closeModal(ctx),
@@ -238,11 +284,12 @@ document.addEventListener('click', (e) => {
   if (!el || el.disabled || el.tagName === 'SELECT' || (el.tagName === 'INPUT' && el.type === 'file')) return;
   if (el.tagName === 'INPUT' && el.type === 'checkbox') return; // tratado em "change"
   const fn = ACTIONS[el.dataset.action];
-  if (fn) { e.preventDefault(); fn(el, e); }
+  if (fn) { const s = actionSound(el); if (s) sfx.play(s); e.preventDefault(); fn(el, e); }
 });
 
 document.addEventListener('change', async (e) => {
   const el = e.target;
+  if (el.matches('select, input[type="checkbox"], input[type="range"]')) sfx.play('tap');
   if (el.matches('input[type="checkbox"][data-action]')) { ACTIONS[el.dataset.action]?.(el); return; }
   if (el.matches('select[data-action="profile-switch"]')) { profiles.switchTo(el.value); store.load(el.value); toast(`Perfil "${profiles.active.name}" ativo.`); return; }
   if (el.matches('input[type="file"][data-action="import"]')) {
@@ -265,6 +312,7 @@ document.addEventListener('change', async (e) => {
 
 let qTimer;
 document.addEventListener('input', (e) => {
+  if (e.target.matches('input[data-action="sound-volume"]')) { sfx.set('volume', Number(e.target.value)); const out = e.target.closest('label')?.querySelector('output'); if (out) out.textContent = `${Math.round(e.target.value * 100)}%`; return; }
   const form = e.target.closest('form[data-form="filters"]');
   if (form && e.target.name === 'q') { clearTimeout(qTimer); qTimer = setTimeout(() => catalog.onFilter(ctx, form), 150); }
 });
@@ -281,8 +329,9 @@ document.addEventListener('submit', (e) => {
   const payload = { rating: fd.has('norating') ? null : fd.get('rating'), review: String(fd.get('review') || '').trim(), notes: String(fd.get('notes') || '').trim() };
   if (kind === 'complete') {
     store.complete(id, { ...payload, date: fd.get('date'), kind: fd.get('kind') });
+    sfx.play('complete');
     toast('Visualização registrada.', 'ok');
-  } else store.editReview(id, payload);
+  } else { store.editReview(id, payload); sfx.play('success'); }
   openModal(ctx, { kind: 'detail', id });
 });
 
@@ -300,7 +349,7 @@ document.addEventListener('keydown', (e) => {
 });
 $('#modal').addEventListener('click', (e) => { if (e.target.id === 'modal') closeModal(ctx); });
 
-window.addEventListener('hashchange', () => { closeModal(ctx); render({ keepScroll: false }); $('#view').focus({ preventScroll: true }); });
+window.addEventListener('hashchange', () => { sfx.play('route'); closeModal(ctx); render({ keepScroll: false }); $('#view').focus({ preventScroll: true }); });
 
 // ---------- início ----------
 $('.brand-mark').innerHTML = emblem({ size: 34 });
@@ -308,3 +357,7 @@ store.load(profiles.activeId);
 playIntro({ agent: profiles.active.name, theme: store.prefs.theme });
 if (!location.hash) history.replaceState(null, '', '#/painel');
 render({ keepScroll: false });
+startFlipClocks();
+syncSoundUI();
+// o navegador só libera áudio depois de um gesto: destrava no primeiro clique ou tecla
+['pointerdown', 'keydown'].forEach((ev) => addEventListener(ev, () => { if (sfx.on && !sfx.running) sfx.unlock(); }, { passive: true }));

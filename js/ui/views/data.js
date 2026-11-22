@@ -1,5 +1,6 @@
 import { CATALOG_VERSION } from '../../catalog/catalog.js';
 import { esc } from '../dom.js';
+import { sfx } from '../sound.js';
 
 export function render(ctx) {
   const { profiles, store, external } = ctx;
@@ -27,6 +28,12 @@ export function render(ctx) {
         <form class="row gap-s" data-form="omdb"><input type="password" name="key" value="${esc(external.apiKey)}" placeholder="Chave OMDb" autocomplete="off" aria-label="Chave da OMDb">
           <button class="btn ghost small" type="submit">Salvar</button></form>
         <button class="btn ghost small" data-action="clear-cache">Limpar cache de pôsteres</button></div>
+      <div class="panel sound-panel"><h3>Som</h3>
+        <p class="muted tiny">Efeitos robóticos nas ações e voz na abertura. Vem desligado e fica salvo só neste aparelho.</p>
+        <button class="btn ${sfx.on ? 'primary' : 'ghost'} small" data-action="sound-toggle" aria-pressed="${sfx.on}">${sfx.on ? '● Som ligado' : '○ Som desligado'}</button>
+        <label class="toggle"><input type="checkbox" data-action="sound-voice" ${sfx.prefs.voice ? 'checked' : ''}> Voz na abertura (precisa dos arquivos em /audio)</label>
+        <label class="field"><span>Volume <output>${Math.round(sfx.prefs.volume * 100)}%</output></span><input type="range" min="0" max="1" step="0.05" value="${sfx.prefs.volume}" data-action="sound-volume" aria-label="Volume"></label>
+        <div class="row wrap gap-s"><button class="btn ghost small" data-action="sound-test">Testar efeito</button><button class="btn ghost small" data-action="voice-test">Testar voz</button></div></div>
       <div class="panel"><h3>Abertura</h3><p class="muted tiny">A abertura aparece uma vez por sessão. Clique, Enter ou Esc pulam a animação.</p>
         <button class="btn ghost small" data-action="replay-intro">▶ Rever abertura</button></div>
     </div>

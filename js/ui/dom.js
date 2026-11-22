@@ -2,6 +2,7 @@
 import { TYPES, SAGAS } from '../catalog/catalog.js';
 import { isUpcoming } from '../core/selectors.js';
 import { emblem, STAR_PATH } from './emblem.js';
+import { sfx } from './sound.js';
 
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 export const $ = (sel, root = document) => root.querySelector(sel);
@@ -35,6 +36,7 @@ export function toast(msg, kind = 'info') {
   el.setAttribute('role', 'status');
   el.textContent = msg;
   host.appendChild(el);
+  if (kind === 'warn') sfx.play('warn');
   setTimeout(() => el.classList.add('out'), 2600);
   setTimeout(() => el.remove(), 3100);
 }

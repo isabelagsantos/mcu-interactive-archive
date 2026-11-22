@@ -1,5 +1,6 @@
 import { BY_ID, SAGAS, PRESETS } from '../../catalog/catalog.js';
 import { computeStats, groupProgress, watchTimeline } from '../../core/selectors.js';
+import { countdownPanel } from '../flipclock.js';
 import { esc, fmtDate, fmtHours, duration, cover, statusBadge, emptyState, sagaLabel } from '../dom.js';
 
 const bar = (label, done, total) => {
@@ -34,6 +35,7 @@ export function render(ctx) {
 
   if (!s.total && mode === 'full') {
     return `<section class="view"><header class="view-head"><p class="eyebrow">CENTRO DE OPERAÇÕES</p><h1>Sua jornada ainda não começou</h1></header>
+      ${countdownPanel()}
       ${emptyState('Nenhuma obra selecionada', 'Monte sua lista no catálogo ou comece por uma das seleções prontas abaixo.')}
       <div class="presets">${Object.entries(PRESETS).map(([k, p]) => `<button class="preset" data-action="preset" data-value="${k}"><strong>${esc(p.label)}</strong><span>${esc(p.desc)}</span><em>${p.ids.length} obras</em></button>`).join('')}</div>
       <p class="center"><a class="btn ghost" href="#/catalogo">Abrir catálogo</a> <button class="btn ghost" data-action="journey" data-value="doomsday">Usar a jornada Doomsday Protocol</button></p></section>`;
@@ -57,6 +59,7 @@ export function render(ctx) {
       </div></header>
 
     <div class="grid dash">
+      ${countdownPanel()}
       <div class="panel hero-progress">${ring}<div class="ring-label"><strong>${s.pct}%</strong><span>${s.watched} de ${s.total}</span></div>
         <div><h2>Progresso geral</h2><p class="muted">${mode === 'doomsday' ? 'Obras da curadoria Doomsday nos níveis escolhidos.' : 'Obras da sua lista pessoal.'}</p></div></div>
 

@@ -75,3 +75,10 @@ Correções e sugestões são bem-vindas por issue ou pull request.
 ## Aviso
 
 Projeto de fã, sem fins lucrativos e sem vínculo com a Marvel Studios ou a Disney. Marvel e os nomes de personagens e obras pertencem aos seus respectivos donos.
+
+## Som, voz e contagem regressiva
+
+- **Contagem regressiva (flip clock)**: dias, horas, minutos e segundos para a estreia de *Vingadores: Doomsday*, no painel e na página Doomsday, em qualquer tema. Usa o horário do seu aparelho.
+- **Efeitos sonoros**: sons robóticos sintetizados no navegador (sem arquivos) a cada ação. Vem **desligado**; o botão de alto-falante no topo liga e desliga, e o volume fica em *Dados → Som*. A preferência é salva só no seu aparelho.
+- **Voz da abertura (opcional)**: coloque os MP3 em `audio/` (gerados por `python tools/gerar_voz.py`, com `pip install edge-tts`). O efeito robótico é aplicado pelo site. Sem os arquivos, a abertura roda normalmente, sem voz.
+- A abertura dura cerca de 5 s sem som e 7 s com voz. Com o som ligado, o navegador pede um toque para liberar o áudio.
