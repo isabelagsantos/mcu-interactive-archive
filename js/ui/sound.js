@@ -77,18 +77,19 @@ export const EFFECTS = {
  * metálico curtíssimo. Recebe qualquer AudioNode de entrada (também serve em
  * OfflineAudioContext, usado nos testes).
  */
+// Efeito leve de I.A.: voz limpa com um brilho metálico (para mais robótico, suba wet e comb).
 export function buildRobotChain(c, input, out) {
-  const hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 190;
+  const hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 130;
   const sum = c.createGain();
-  const dry = c.createGain(); dry.gain.value = 0.65;
+  const dry = c.createGain(); dry.gain.value = 0.85;
   const ring = c.createGain(); ring.gain.value = 0;
   const osc = c.createOscillator(); osc.frequency.value = 58; osc.connect(ring.gain);
-  const wet = c.createGain(); wet.gain.value = 0.55;
+  const wet = c.createGain(); wet.gain.value = 0.18;
   const dly = c.createDelay(0.05); dly.delayTime.value = 0.0085;
   const fb = c.createGain(); fb.gain.value = 0.38;
-  const comb = c.createGain(); comb.gain.value = 0.5;
-  const peak = c.createBiquadFilter(); peak.type = 'peaking'; peak.frequency.value = 2400; peak.gain.value = 4; peak.Q.value = 0.9;
-  const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 7200;
+  const comb = c.createGain(); comb.gain.value = 0.22;
+  const peak = c.createBiquadFilter(); peak.type = 'peaking'; peak.frequency.value = 2400; peak.gain.value = 3; peak.Q.value = 0.9;
+  const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 9000;
   input.connect(hp);
   hp.connect(dry); dry.connect(sum);
   hp.connect(ring); ring.connect(wet); wet.connect(sum);
